@@ -1,13 +1,14 @@
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config();
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const app = express();
-const port = 3000;
+const port = process.env.port || 3000;
 
 app.use(cors());
 app.use(express.json());
 
-const uri = "mongodb+srv://CleanSphereDB:r6b6rfuwdxXQwiiz@cluster0.hgbitkj.mongodb.net/?appName=Cluster0";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.hgbitkj.mongodb.net/?appName=Cluster0`;
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -20,14 +21,19 @@ async function run() {
   try {
     await client.connect();
     const db = client.db('CleanSphereDB')
-    const issuesCollection = db.collection('issues')
+    const issuesCollection = db.collection('issues');
+
+    app.get('/issues', async (req, res) => {
+        const result = await issuesCollection.find().toArray();
+        res.send(result)
+    })
 
 
 
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
-    await client.close();
+
   }
 }
 run().catch(console.dir);
