@@ -41,6 +41,13 @@ async function run() {
             const objectId = new ObjectId(id)
             const result = await issuesCollection.findOne({ _id: objectId })
             res.send(result)
+        });
+
+        app.get('/my-issues', async (req, res) => {
+            const {email} = req.query;
+            const query = {email: email};
+            const result = await issuesCollection.find(query).toArray();
+            res.send(result)
         })
 
 
