@@ -20,8 +20,16 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         await client.connect();
-        const db = client.db('CleanSphereDB')
-        const issuesCollection = db.collection('issues');
+        const database = client.db('CleanSphereDB')
+        const issuesCollection = database.collection('issues');
+
+        app.post('/issues', async(req, res) => {
+            const issue = req.body
+            const result = await issuesCollection.insertOne(issue);
+            res.send(result)
+            console.log(issue);
+            
+        })
 
         app.get('/issues', async (req, res) => {
             const result = await issuesCollection.find().toArray();
@@ -31,10 +39,8 @@ async function run() {
         app.get('/issues/:id', async (req, res) => {
             const { id } = req.params;
             const objectId = new ObjectId(id)
-
-            const result = await issuesCollection.findOne({_id: objectId})
-
-                res.send(result)
+            const result = await issuesCollection.findOne({ _id: objectId })
+            res.send(result)
         })
 
 
