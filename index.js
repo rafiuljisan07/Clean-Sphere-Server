@@ -22,7 +22,7 @@ async function run() {
         await client.connect();
         const database = client.db('CleanSphereDB')
         const issuesCollection = database.collection('issues');
-        const contributionsCollection= database.collection('contributions')
+        const contributionsCollection = database.collection('contributions')
 
         app.post('/issues', async (req, res) => {
             const issue = req.body
@@ -76,12 +76,19 @@ async function run() {
             res.send(result)
         });
 
-        app.post('/contributions', async(req, res) => {
+        app.post('/contributions', async (req, res) => {
             const contribution = req.body
             console.log(contribution);
             const result = await contributionsCollection.insertOne(contribution);
             res.send(result)
-            
+
+        })
+
+        app.get('/my-contributions', async (req, res) => {
+            const { email } = req.query;
+            const query = { email: email };
+            const result = await contributionsCollection.find(query).toArray();
+            res.send(result)
         })
 
 
