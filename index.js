@@ -22,13 +22,14 @@ async function run() {
         await client.connect();
         const database = client.db('CleanSphereDB')
         const issuesCollection = database.collection('issues');
+        const contributionsCollection= database.collection('contributions')
 
-        app.post('/issues', async(req, res) => {
+        app.post('/issues', async (req, res) => {
             const issue = req.body
             const result = await issuesCollection.insertOne(issue);
             res.send(result)
             console.log(issue);
-            
+
         })
 
         app.get('/issues', async (req, res) => {
@@ -43,24 +44,47 @@ async function run() {
             res.send(result)
         });
 
+        app.get('/issues/category/:name', async (req, res) => {
+            const category = req.params.name;
+            const result = await issuesCollection.find({ category }).toArray();
+            res.send(result)
+        })
+
         app.get('/my-issues', async (req, res) => {
-            const {email} = req.query;
-            const query = {email: email};
+            const { email } = req.query;
+            const query = { email: email };
             const result = await issuesCollection.find(query).toArray();
             res.send(result)
         });
 
-        app.put('/update/:id', async(req, res) => {
+        app.put('/update/:id', async (req, res) => {
             const data = req.body;
-            const {id} = req.params;
-            const query = {_id: new ObjectId(id)}
+            const { id } = req.params;
+            const query = { _id: new ObjectId(id) }
 
             const updatedIssue = {
                 $set: data
             }
-            const result = await issuesCollection.updateOne(query, updatedIssue)
+            const result = await issuesCollection.updateOne(query, updatedIssue);
             res.send(result)
+        });
+
+        app.delete('/delete/:id', async (req, res) => {
+            const { id } = req.params;
+            const query = { _id: new ObjectId(id) };
+            const result = await issuesCollection.deleteOne(query);
+            res.send(result)
+        });
+
+        app.post('/contributions', async(req, res) => {
+            const contribution = req.body
+            console.log(contribution);
+            const result = await contributionsCollection.insertOne(contribution);
+            res.send(result)
+            
         })
+
+
 
 
 
